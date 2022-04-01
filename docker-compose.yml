@@ -1,14 +1,33 @@
 version: '3.3'
 
 services:
-        api:
-                build: .
-
-        nginx:
+        public_loadbalancer:
                 image: nginx:latest
                 volumes:
-                        - ./conf.d:/etc/nginx/conf.d
+                        - ./conf.d/loadBalancer:/etc/nginx/conf.d
                 depends_on:
                         - api
                 ports:
                         - 2381:2381
+                networks:
+                        - front
+
+        api:
+                build: .
+                networks:
+                        - back
+
+        nginx:
+                image: nginx:latest
+                volumes:
+                        - ./conf.d/nginx:/etc/nginx/conf.d
+                depends_on:
+                        - api
+                          #ports:
+                          #- 2381:2381
+                networks:
+                        - front
+                        - back
+networks:
+        front:
+        back:
